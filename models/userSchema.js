@@ -1,7 +1,6 @@
 // import { required } from "joi";
 import mongoose from "mongoose";
-import bycrpt from 'bcrypt'
-// import error from 'console.error();
+import bcrypt from 'bcrypt'
 
 const userSchema = new mongoose.Schema({
     username:{
@@ -20,14 +19,12 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     });
-
-const User = mongoose.model('User', userSchema)
 userSchema.pre('save', async function (next){
     if(!this.isModified('password')) 
         return next()
     try{
-        const mixture = await bycrpt.genMixture(10)
-        this.password =  await bycrpt.hash(this.password, mixture)
+        const salt = await bcrypt.genSalt(10)
+        this.password =  await bcrypt.hash(this.password, salt)
         next()
 
     } catch (err){
@@ -35,4 +32,5 @@ userSchema.pre('save', async function (next){
     }
 })
 
+const User = mongoose.model('User', userSchema)
 export default User
